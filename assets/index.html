@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NetManager Dark</title>
+    <link rel="stylesheet" href="css/all.min.css">
+<style>
+        /* --- VARIABLE: DEFAULT DARK --- */
+        :root {
+            /* Warna Default (Dark Mode) */
+            --bg-body: #000000;
+            --bg-card: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent: #0a84ff;
+            --danger: #ff453a;
+            --success: #30d158;
+            --separator: #38383a;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+        }
+
+        /* Override buat Light Mode */
+        body.light-mode {
+            --bg-body: #f2f2f7;
+            --bg-card: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --accent: #007aff;
+            --danger: #ff3b30;
+            --success: #34c759;
+            --separator: #c6c6c8;
+            --nav-bg: rgba(249, 249, 249, 0.95);
+        }
+
+        /* --- BASE STYLES --- */
+        body {
+            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body); color: var(--text-primary);
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px; /* Space for bottom nav */
+            transition: background 0.3s;
+        }
+
+        /* --- LAYOUT UTILS --- */
+        .hidden { display: none !important; }
+        .flex { display: flex; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .text-mute { color: var(--text-secondary); font-size: 13px; }
+        
+        /* List Group (iOS Style) */
+        .list-group { background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .list-item { padding: 14px 16px; border-bottom: 0.5px solid var(--separator); display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); transition: 0.2s; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:active { background-color: var(--separator); }
+        
+        /* Buttons & Inputs */
+        .ios-btn { background-color: var(--bg-card); color: var(--accent); border: none; font-size: 16px; font-weight: 500; padding: 12px 16px; border-radius: 12px; width: 100%; margin-bottom: 10px; }
+        .ios-btn.danger { color: var(--danger); }
+        .ios-btn:active { opacity: 0.7; transform: scale(0.98); }
+        .ios-input { width: 100%; box-sizing: border-box; border: none; background: var(--bg-card); padding: 15px; font-size: 16px; color: var(--text-primary); border-radius: 12px; margin-bottom: 15px; outline: none; border: 1px solid var(--separator); }
+
+        /* --- NAVIGATION BAR (HEADER) --- */
+        .navbar { position: sticky; top: 0; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 0 15px; z-index: 100; border-bottom: 0.5px solid var(--separator); display: flex; justify-content: space-between; align-items: center; height: 50px; }
+        .nav-title { 
+            font-size: 17px; 
+            font-weight: 600; 
+            /* Hapus position absolute biar ga nabrak tombol back */
+            /* position: absolute; left: 50%; transform: translateX(-50%); width: 60%; */
+            
+            /* Ganti jadi ini: */
+            flex: 1; 
+            text-align: center; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            margin: 0 5px; /* Jarak aman */
+        }
+        .nav-btn { background: none; border: none; color: var(--accent); font-size: 16px; cursor: pointer; padding: 10px; }
+        .nav-btn i { font-size: 18px; }
+
+        /* --- VIEW CONTAINER --- */
+        .view-container { padding: 20px 16px; }
+        
+        /* Search Bar */
+        .search-bar { background: rgba(142, 142, 147, 0.12); border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; margin-bottom: 15px; }
+        .search-bar input { border: none; background: transparent; margin-left: 8px; font-size: 16px; color: var(--text-primary); width: 100%; outline: none;}
+
+        /* --- TAB BAR (BOTTOM NAV) --- */
+        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(20px); border-top: 0.5px solid var(--separator); display: flex; justify-content: space-around; padding: 10px 0 20px 0; z-index: 100; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); font-size: 11px; flex: 1; padding: 5px; }
+        .tab-item.active { color: var(--accent); }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
+
+        /* --- CUSTOM UI: TOP NAV MODE --- */
+        body.nav-top { padding-bottom: 0; padding-top: 100px; }
+        body.nav-top .tab-bar { top: 50px; bottom: auto; border-top: none; border-bottom: 0.5px solid var(--separator); padding: 10px 0; }
+        body.nav-top .navbar { z-index: 200; }
+
+        /* --- DETAIL PAGE SPECIFIC --- */
+        .detail-header-img { width: 100%; height: 160px; object-fit: cover; background: var(--separator); margin-bottom: -10px; }
+        .segment-control { display: flex; background: rgba(142, 142, 147, 0.2); padding: 3px; border-radius: 9px; margin: 15px 0; }
+        .segment-btn { flex: 1; text-align: center; padding: 7px; font-size: 13px; font-weight: 500; color: var(--text-primary); border-radius: 7px; }
+        .segment-btn.active { background: var(--bg-card); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dot-ready { background: var(--success); } .dot-error { background: var(--danger); }
+
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-box { background: var(--bg-card); width: 85%; max-width: 340px; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--separator); }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
+        
+        /* Terminal Log */
+        .log-container { background: #111; color: #fff; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 8px; height: 250px; overflow-y: auto; text-align: left; white-space: pre-wrap; border: 1px solid #333; }
+        .log-red { color: #ff453a; } .log-green { color: #30d158; }
+
+        /* Toggle Buttons UI */
+        .ui-toggle-group { display: flex; gap: 5px; background: rgba(142,142,147,0.2); padding: 3px; border-radius: 8px; margin-top: 10px; }
+        .ui-toggle-btn { flex: 1; border: none; background: none; padding: 8px; font-size: 13px; color: var(--text-primary); border-radius: 6px; }
+        .ui-toggle-btn.active { background: var(--bg-card); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+</style>
+  </head>
+  <body>
+    <input type="file" id="fileInputTrigger" accept="application/zip" style="display:none;">
+
+    <div id="view-accounts" class="app-view">
+	  <div class="navbar">
+		<div class="nav-title">NetManager</div>
+		<button class="nav-btn" onclick="openModal('auth')"><i class="fas fa-plus"></i></button>
+	  </div>
+	  <div class="view-container">
+		<h3 style="margin: 10px 5px; font-size: 22px;">Accounts</h3>
+		<div class="list-group" id="list-accounts"></div>
+		<div class="text-mute" style="text-align:center;">Pilih akun untuk melihat project.</div>
+	  </div>
+    </div>
+
+    <div id="view-projects" class="app-view hidden">
+	  <div class="navbar">
+		<button class="nav-btn" onclick="nav.backToAccounts()"><i class="fas fa-chevron-left"></i> Accounts</button>
+		<div class="nav-title" id="project-header-title">Projects</div>
+		<button class="nav-btn" onclick="openModal('createSite')"><i class="fas fa-plus"></i></button>
+	  </div>
+	  <div class="view-container">
+		<div class="search-bar"><i class="fas fa-search text-mute"></i><input type="text" placeholder="Cari website..." onkeyup="app.filterSites(this.value)"></div>
+		<div class="list-group" id="list-sites"></div>
+	  </div>
+    </div>
+
+    <div id="view-detail" class="app-view hidden">
+	  <div class="navbar">
+		<button class="nav-btn" onclick="nav.backToProjects()"><i class="fas fa-chevron-left"></i> Back</button>
+		<div class="nav-title" id="detail-title">Site Name</div>
+	  </div>
+	  <div style="padding: 16px 16px 0 16px;">
+		<div class="list-group" style="margin-bottom:10px;">
+		  <img id="detail-thumb" class="detail-header-img">
+		  <div class="list-item" onclick="detail.triggerDeploy()">
+			<span style="color:var(--accent); font-weight:600;"><i class="fas fa-cloud-upload-alt"></i> Upload Deploy Baru (.zip)</span>
+		  </div>
+		  <a id="detail-url-link" href="#" target="_blank" class="list-item" style="text-decoration: none;">
+			<span style="color:var(--accent)"><i class="fas fa-external-link-alt"></i> Kunjungi Website</span>
+		  </a>
+		</div>
+
+		<div class="segment-control">
+		  <div class="segment-btn active" onclick="detail.switchTab('deploys', this)">History</div>
+		  <div class="segment-btn" onclick="detail.switchTab('env', this)">ENV</div>
+		  <div class="segment-btn" onclick="detail.switchTab('manage', this)">Atur</div>
+		</div>
+	  </div>
+
+	  <div class="view-container" style="padding-top:0;">
+		<div id="seg-deploys" class="seg-content"><div class="list-group" id="list-deploys"></div></div>
+
+		<div id="seg-env" class="seg-content hidden">
+		  <div class="list-group" style="padding: 15px;">
+			<input id="env-key" class="ios-input" placeholder="KEY (e.g. API_KEY)" style="margin-bottom:8px;">
+			<input id="env-val" class="ios-input" placeholder="VALUE">
+			<button class="ios-btn" onclick="detail.addEnv()">Simpan Variable</button>
+		  </div>
+		  <div class="list-group" id="list-env"></div>
+		</div>
+
+		<div id="seg-manage" class="seg-content hidden">
+		  <div class="list-group">
+			<div class="list-item" onclick="openModal('rename')">
+			  <span>Ganti Nama Web</span> <i class="fas fa-pen text-mute"></i>
+			</div>
+			<div class="list-item" onclick="detail.downloadBackup()">
+			  <span>Download Source (.zip)</span> <i class="fas fa-download text-mute"></i>
+			</div>
+		  </div>
+		  <button class="ios-btn danger" onclick="detail.deleteSite()">Hapus Website Permanen</button>
+		</div>
+	  </div>
+    </div>
+
+    <div id="view-settings" class="app-view hidden">
+	  <div class="navbar"><div class="nav-title">Pengaturan</div></div>
+	  <div class="view-container">
+		<h3 style="margin: 10px 5px; font-size: 22px;">Tampilan</h3>
+
+		<div class="list-group">
+		  <div class="list-item" style="display:block">
+			<div class="flex flex-between"><span>Tema Aplikasi</span><i class="fas fa-adjust"></i></div>
+			<div class="ui-toggle-group">
+			  <button class="ui-toggle-btn" id="btn-theme-dark" onclick="app.setTheme('dark')">Dark (Default)</button>
+			  <button class="ui-toggle-btn" id="btn-theme-light" onclick="app.setTheme('light')">Light</button>
+			</div>
+		  </div>
+		</div>
+
+		<div class="list-group">
+		  <div class="list-item" style="display:block">
+			<div class="flex flex-between"><span>Posisi Menu</span><i class="fas fa-arrows-alt-v"></i></div>
+			<div class="text-mute" style="margin:5px 0;">Pindah ke atas jika layar bawah rusak.</div>
+			<div class="ui-toggle-group">
+			  <button class="ui-toggle-btn" id="btn-nav-bottom" onclick="app.setNav('bottom')">Bawah</button>
+			  <button class="ui-toggle-btn" id="btn-nav-top" onclick="app.setNav('top')">Atas</button>
+			</div>
+		  </div>
+		</div>
+
+		<div class="text-mute" style="text-align:center; margin-top:30px;">
+		  NetManager v3.0 by Rehan<br>Java 7 + Bridge API
+		</div>
+	  </div>
+    </div>
+
+    <div class="tab-bar">
+	  <div class="tab-item active" onclick="nav.switchMain('view-accounts', this)">
+		<i class="fas fa-users-cog"></i>Accounts
+	  </div>
+	  <div class="tab-item" onclick="nav.switchMain('view-settings', this)">
+		<i class="fas fa-cog"></i>Settings
+	  </div>
+    </div>
+
+    <div id="modal-auth" class="modal-overlay hidden">
+	  <div class="modal-box">
+		<div class="modal-title">Tambah Akun</div>
+		<input id="auth-name" class="ios-input" placeholder="Nama Label (Bebas)">
+		<input id="auth-token" class="ios-input" placeholder="Netlify Access Token">
+		<button class="ios-btn" onclick="app.saveAccount()">Simpan</button>
+		<button class="ios-btn danger" onclick="closeModal('auth')">Batal</button>
+	  </div>
+    </div>
+    <div id="modal-createSite" class="modal-overlay hidden">
+	  <div class="modal-box">
+		<div class="modal-title">Web Baru</div>
+		<input id="new-site-name" class="ios-input" placeholder="Subdomain (Opsional)">
+		<p class="text-mute">Selanjutnya pilih file ZIP.</p>
+		<button class="ios-btn" onclick="app.createSiteTrigger()">Pilih ZIP & Upload</button>
+		<button class="ios-btn danger" onclick="closeModal('createSite')">Batal</button>
+	  </div>
+    </div>
+    <div id="modal-rename" class="modal-overlay hidden">
+	  <div class="modal-box">
+		<div class="modal-title">Ganti Nama</div>
+		<input id="rename-val" class="ios-input" placeholder="nama-baru">
+		<button class="ios-btn" onclick="detail.saveRename()">Simpan</button>
+		<button class="ios-btn danger" onclick="closeModal('rename')">Batal</button>
+	  </div>
+    </div>
+    <div id="modal-log" class="modal-overlay hidden">
+	  <div class="modal-box" style="max-width: 90%;">
+		<div class="modal-title flex flex-between" style="font-size:16px;">Log Build <i class="fas fa-times" onclick="closeModal('log')"></i></div>
+		<div class="log-container" id="log-content">Loading...</div>
+		<button class="ios-btn" style="margin-top:10px; padding:8px;" onclick="detail.copyLog()">Salin Log</button>
+	  </div>
+    </div>
+
+<script>
+// logika navigasi
+const nav = {
+    // pindah antar tab "account" / "setting"
+    switchMain: (viewId, tabEl) => {
+        document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+        document.querySelectorAll('.tab-bar .tab-item').forEach(el => el.classList.remove('active'));
+        if(tabEl) tabEl.classList.add('active');
+    },
+    // masuk ke project
+    openProjects: (accName) => {
+        document.getElementById('view-accounts').classList.add('hidden');
+        document.getElementById('view-projects').classList.remove('hidden');
+        document.getElementById('project-header-title').innerText = accName;
+    },
+    // balik ke list aoun
+    backToAccounts: () => {
+        document.getElementById('view-projects').classList.add('hidden');
+        document.getElementById('view-accounts').classList.remove('hidden');
+        app.currToken = null; // clear token
+    },
+    // masuk ke detail
+    openDetail: () => {
+        document.getElementById('view-projects').classList.add('hidden');
+        document.getElementById('view-detail').classList.remove('hidden');
+    },
+    // balik ke project
+    backToProjects: () => {
+        document.getElementById('view-detail').classList.add('hidden');
+        document.getElementById('view-projects').classList.remove('hidden');
+    }
+};
+
+//app logic
+const app = {
+    accounts: [], currToken: null, sitesData: [],
+    
+    init: () => {
+        // load theme
+        const theme = localStorage.getItem('theme') || 'dark'; 
+        app.setTheme(theme);
+
+        // load nav pos
+        const navPos = localStorage.getItem('navPos') || 'bottom';
+        app.setNav(navPos);
+
+        // load akum
+        try { app.accounts = JSON.parse(Android.getTokenData()); } catch(e) { app.accounts = []; }
+        app.renderAccounts();
+    },
+
+    setTheme: (mode) => {
+        if(mode === 'light') document.body.classList.add('light-mode');
+        else document.body.classList.remove('light-mode'); // Default Dark
+        localStorage.setItem('theme', mode);
+        document.getElementById('btn-theme-light').classList.remove('active');
+        document.getElementById('btn-theme-dark').classList.remove('active');
+        document.getElementById('btn-theme-'+mode).classList.add('active');
+    },
+
+    setNav: (pos) => {
+        if(pos === 'top') document.body.classList.add('nav-top');
+        else document.body.classList.remove('nav-top');
+        localStorage.setItem('navPos', pos);
+        document.getElementById('btn-nav-bottom').classList.remove('active');
+        document.getElementById('btn-nav-top').classList.remove('active');
+        document.getElementById('btn-nav-'+pos).classList.add('active');
+    },
+
+    toast: (msg) => Android.showToast(msg),
+
+    renderAccounts: () => {
+        const list = document.getElementById('list-accounts');
+        if(app.accounts.length === 0) { list.innerHTML = '<div class="list-item text-mute">Belum ada akun.</div>'; return; }
+        list.innerHTML = app.accounts.map(acc => `
+            <div class="list-item" onclick="app.selectAccount('${acc.token}', '${acc.name}')">
+                <div class="flex"><i class="fas fa-folder-open" style="font-size:20px; margin-right:12px; color:var(--accent)"></i> 
+                <div style="font-weight:600; font-size:16px;">${acc.name}</div></div>
+                <i class="fas fa-chevron-right text-mute"></i>
+            </div>`).join('');
+    },
+
+    saveAccount: () => {
+        const n = document.getElementById('auth-name').value, t = document.getElementById('auth-token').value;
+        if(!n || !t) return app.toast("Isi semua!");
+        app.accounts.push({name:n, token:t}); Android.saveTokenData(JSON.stringify(app.accounts));
+        app.renderAccounts(); closeModal('auth'); 
+        document.getElementById('auth-name').value=''; document.getElementById('auth-token').value='';
+    },
+
+    selectAccount: (token, name) => {
+        app.currToken = token;
+        nav.openProjects(name);
+        app.fetchSites();
+    },
+
+    fetchSites: () => {
+        document.getElementById('list-sites').innerHTML = '<div class="list-item text-mute"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>';
+        app.api('/sites?sort=updated_at', 'GET', null, (data) => { app.sitesData = data; app.renderSites(app.sitesData); });
+    },
+
+    renderSites: (sites) => {
+        if(!sites || sites.length === 0) { document.getElementById('list-sites').innerHTML = '<div class="list-item text-mute">Kosong.</div>'; return; }
+        document.getElementById('list-sites').innerHTML = sites.map(s => `
+            <div class="list-item" onclick='detail.open(${JSON.stringify(s)})'>
+                <div style="overflow:hidden; width:85%;">
+                    <div style="font-weight:600; font-size:15px; margin-bottom:4px;">${s.name}</div>
+                    <div class="text-mute" style="font-size:12px;">${s.url}</div>
+                </div>
+                <div class="flex"><span class="status-dot ${s.state==='ready'?'dot-ready':'dot-error'}"></span> <i class="fas fa-chevron-right text-mute"></i></div>
+            </div>`).join('');
+    },
+    
+    filterSites: (q) => { app.renderSites(app.sitesData.filter(s => s.name.toLowerCase().includes(q.toLowerCase()))); },
+    
+    createSiteTrigger: () => {
+        const name = document.getElementById('new-site-name').value || "";
+        closeModal('createSite');
+        Android.triggerFilePicker("create", name, app.currToken);
+    },
+
+    onDeploySuccess: (resJson) => {
+        app.toast("Deploy Berhasil!");
+        if(!document.getElementById('view-detail').classList.contains('hidden')) detail.loadDeploys();
+        else app.fetchSites();
+    },
+
+    api: (endpoint, method, body, callback) => {
+        const cbId = "cb_" + Date.now();
+        window[cbId] = callback;
+        Android.apiRequest(endpoint, method, app.currToken, body ? JSON.stringify(body) : "", cbId);
+    }
+};
+
+// detail logic
+const detail = {
+    data: null, envCache: {},
+    open: (site) => {
+        detail.data = site;
+        document.getElementById('detail-title').innerText = site.name;
+        // detail gambar
+        document.getElementById('detail-thumb').src = site.screenshot_url || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+        document.getElementById('detail-url-link').href = site.url;
+        nav.openDetail();
+        // ke tab hystori
+        document.querySelector('.segment-btn').click(); 
+    },
+    
+    switchTab: (segId, btnEl) => {
+        document.querySelectorAll('.seg-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('seg-' + segId).classList.remove('hidden');
+        document.querySelectorAll('.segment-btn').forEach(el => el.classList.remove('active'));
+        btnEl.classList.add('active');
+        if(segId === 'deploys') detail.loadDeploys();
+        if(segId === 'env') detail.loadEnv();
+    },
+
+    triggerDeploy: () => { Android.triggerFilePicker("update", detail.data.id, app.currToken); },
+
+    loadDeploys: () => {
+        const el = document.getElementById('list-deploys');
+        el.innerHTML = '<div class="list-item text-mute">Memuat history...</div>';
+        app.api(`/sites/${detail.data.id}/deploys?per_page=15`, 'GET', null, (data) => {
+            if(!data || data.length === 0) { el.innerHTML = '<div class="list-item text-mute">Belum ada deploy.</div>'; return; }
+            el.innerHTML = data.map(d => `
+                <div class="list-item" style="display:block">
+                    <div class="flex flex-between" style="margin-bottom:5px;">
+                        <b style="font-size:13px;">${new Date(d.created_at).toLocaleDateString()} ${new Date(d.created_at).toLocaleTimeString()}</b> 
+                        <span class="status-dot ${d.state==='ready'?'dot-ready':'dot-error'}"></span>
+                    </div>
+                    <div class="text-mute" style="font-size:12px; margin-bottom:8px;">${d.summary?.messages?.[0] || d.context}</div>
+                    <div class="flex" style="gap:10px;">
+                        <button class="ios-btn" style="font-size:12px; padding:6px; width:auto; margin:0; background:#333;" onclick="detail.viewLog('${d.id}')">Log</button>
+                        ${(d.context==='production'&&d.state==='ready') ? `<button class="ios-btn danger" style="font-size:12px; padding:6px; width:auto; margin:0" onclick="detail.restore('${d.id}')">Rollback</button>`:''}
+                    </div>
+                </div>`).join('');
+        });
+    },
+
+    viewLog: (id) => {
+        openModal('log'); document.getElementById('log-content').innerHTML = "Mengambil log...";
+        app.api(`/sites/${detail.data.id}/deploys/${id}`, 'GET', null, (d) => {
+            let html = `<span class="log-green">ID: ${d.id}\nCtx: ${d.context}</span>\n----------------\n`;
+            if(d.error_message) html += `<span class="log-red">${d.error_message}</span>\n`;
+            if(d.summary?.messages) d.summary.messages.forEach(m => html += `> ${m}\n`);
+            document.getElementById('log-content').innerHTML = html || "Log kosong.";
+        });
+    },
+
+    copyLog: () => { Android.copyText(document.getElementById('log-content').innerText); },
+    
+    restore: (id) => { 
+        if(confirm("Rollback ke versi ini?")) app.api(`/sites/${detail.data.id}/deploys/${id}/restore`, 'POST', {}, () => { app.toast("Berhasil Rollback!"); detail.loadDeploys(); }); 
+    },
+
+    loadEnv: () => {
+        document.getElementById('list-env').innerHTML = '<div class="list-item text-mute">Loading...</div>';
+        app.api(`/sites/${detail.data.id}`, 'GET', null, (s) => {
+            detail.envCache = s.build_settings.env || {};
+            const keys = Object.keys(detail.envCache);
+            if(keys.length === 0) { document.getElementById('list-env').innerHTML = '<div class="list-item text-mute">Belum ada variable.</div>'; return; }
+            document.getElementById('list-env').innerHTML = keys.map(k => `
+                <div class="list-item">
+                    <div style="overflow:hidden; width:80%">
+                        <div style="color:var(--accent); font-weight:600; font-size:13px;">${k}</div>
+                        <div class="text-mute" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${detail.envCache[k]}</div>
+                    </div>
+                    <i class="fas fa-trash" style="color:var(--danger); padding:10px;" onclick="detail.deleteEnv('${k}')"></i>
+                </div>`).join('');
+        });
+    },
+
+    addEnv: () => {
+        const k=document.getElementById('env-key').value, v=document.getElementById('env-val').value;
+        if(!k||!v) return app.toast("Isi key & value!");
+        detail.envCache[k] = v; detail.saveEnv();
+    },
+
+    deleteEnv: (k) => { 
+        if(confirm("Hapus "+k+"?")) { delete detail.envCache[k]; detail.saveEnv(); } 
+    },
+
+    saveEnv: () => {
+        app.toast("Menyimpan ENV...");
+        app.api(`/sites/${detail.data.id}`, 'PATCH', {build_settings:{env:detail.envCache}}, () => { 
+            app.toast("Tersimpan!"); detail.loadEnv(); 
+            document.getElementById('env-key').value=''; document.getElementById('env-val').value=''; 
+        });
+    },
+
+    downloadBackup: () => {
+        app.toast("Mencari deploy aktif...");
+        app.api(`/sites/${detail.data.id}/deploys?per_page=1`, 'GET', null, (res) => {
+            if(res && res[0] && res[0].state === 'ready') {
+                const url = `https://api.netlify.com/api/v1/sites/${detail.data.id}/deploys/${res[0].id}/download`;
+                Android.downloadFile(url, detail.data.name + "-backup.zip", app.currToken);
+            } else { app.toast("Tidak ada deploy yang siap didownload."); }
+        });
+    },
+
+    saveRename: () => {
+        const newName = document.getElementById('rename-val').value;
+        if(!newName) return;
+        app.api(`/sites/${detail.data.id}`, 'PUT', {name:newName}, (res) => {
+            if(res.id) { app.toast("Nama diganti!"); detail.data.name = res.name; document.getElementById('detail-title').innerText=res.name; closeModal('rename'); }
+            else app.toast("Gagal (Nama sudah dipakai orang lain?)");
+        });
+    },
+
+    deleteSite: () => {
+        if(confirm("YAKIN HAPUS WEBSITE INI?\nGa bisa dibatalin loh!")) {
+            app.toast("Menghapus...");
+            app.api(`/sites/${detail.data.id}`, 'DELETE', null, () => { 
+                app.toast("Terhapus."); nav.backToProjects(); app.fetchSites(); 
+            });
+        }
+    }
+};
+
+// utils ui
+function openModal(id) { document.getElementById('modal-'+id).classList.remove('hidden'); if(id==='rename') document.getElementById('rename-val').value = detail.data.name; }
+function closeModal(id) { document.getElementById('modal-'+id).classList.add('hidden'); }
+
+// bridge listener
+window.onApiResult = (id, code, resStr) => {
+    let data = resStr; try { data = JSON.parse(resStr); } catch(e){}
+    if(window[id]) { window[id](code>=200&&code<300 ? data : null); delete window[id]; if(code>=400) app.toast("API Error: "+(data.error||code)); }
+}
+
+window.onload = app.init;
+</script>
+  </body>
+</html>
